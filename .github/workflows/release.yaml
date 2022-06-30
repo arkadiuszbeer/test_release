@@ -40,25 +40,30 @@ jobs:
               <img src="${{ github.event.org.avatar_url }}/CONTRIBUTORS.svg" />
           </a>' >> RELEASE_BODY.txt
           
-      #- name: Create release 🌟
-      #  uses: softprops/action-gh-release@v1
-      #  with:
-      #    body_path: RELEASE_BODY.txt
-      #    token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Generate Changelog
-        id: changelog
-        uses: jaywcjlove/changelog-generator@v1.5.0
+      - name: Create release 🌟
+        uses: softprops/action-gh-release@v1
         with:
-          head-ref: ${{steps.create_tag.outputs.version}}
-          filter-author: (小弟调调™|Renovate Bot)
-          filter: '[R|r]elease[d]\s+[v|V]\d(\.\d+){0,2}'
-          
-      - name: Create Release
-        uses: ncipollo/release-action@v1
-        with:
+          body_path: RELEASE_BODY.txt
           token: ${{ secrets.GITHUB_TOKEN }}
-          bodyFile: "RELEASE_BODY.txt"
-          artifacts: "release.tar.gz,foo/*.txt"
-          allowUpdates: true
+          files: 
+            "build/CONTRIBUTORS.svg"
+          generate_release_notes: true
+
+
+
+      # - name: Generate Changelog
+      #   id: changelog
+      #   uses: jaywcjlove/changelog-generator@v1.5.0
+      #   with:
+      #     head-ref: ${{steps.create_tag.outputs.version}}
+      #     filter-author: (小弟调调™|Renovate Bot)
+      #     filter: '[R|r]elease[d]\s+[v|V]\d(\.\d+){0,2}'
+          
+      # - name: Create Release
+      #   uses: ncipollo/release-action@v1
+      #   with:
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     bodyFile: "RELEASE_BODY.txt"
+      #     artifacts: "release.tar.gz,foo/*.txt"
+      #     allowUpdates: true
           
