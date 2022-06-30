@@ -28,7 +28,15 @@ jobs:
         uses: mikepenz/release-changelog-builder-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+        with
+          configuration: "configs.json"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Echo Complex Configuration Changelog
+        env:
+          CHANGELOG: ${{ steps.complex_release.outputs.changelog }}
+        run: echo "CHANGELOG"
+
       - name: Generate Contributors Images
         uses: jaywcjlove/github-action-contributors@main
         with:
@@ -46,7 +54,10 @@ jobs:
               <img src="${{ github.event.org.avatar_url }}/CONTRIBUTORS.svg" />
           </a>' >> RELEASE_BODY.txt
           ${{steps.github_release.outputs.changelog}} >>  RELEASE_BODY.txt 
-          
+      
+      - name: Test
+        run: cat RELEASE_BODY.txt 
+
       - name: Create release 🌟
         uses: softprops/action-gh-release@v1
         with:
