@@ -40,11 +40,11 @@ jobs:
               <img src="${{ github.event.org.avatar_url }}/CONTRIBUTORS.svg" />
           </a>' >> RELEASE_BODY.txt
           
-      - name: Create release 🌟
-        uses: softprops/action-gh-release@v1
-        with:
-          body_path: RELEASE_BODY.txt
-          token: ${{ secrets.GITHUB_TOKEN }}
+      #- name: Create release 🌟
+      #  uses: softprops/action-gh-release@v1
+      #  with:
+      #    body_path: RELEASE_BODY.txt
+      #    token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate Changelog
         id: changelog
