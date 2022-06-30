@@ -23,6 +23,12 @@ jobs:
       - name: Checkout repo 🛎
         uses: actions/checkout@v3
 
+      - name: "Build Changelog"
+        id: build_changelog
+        uses: mikepenz/release-changelog-builder-action@{latest-release}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: Generate Contributors Images
         uses: jaywcjlove/github-action-contributors@main
         with:
@@ -31,7 +37,7 @@ jobs:
           output: build/CONTRIBUTORS.svg
           avatarSize: 36
 
-      - name: Generate Changelog 📜
+      - name: Combine Changelog 📜
         run: |
           RELEASE_VERSION=$(awk -F: '/Version:/{gsub(/[ ]+/,"") ; print $2}' DESCRIPTION)
           REPOSITORY_NAME="${{ github.event.repository.name }}"
@@ -39,14 +45,16 @@ jobs:
           echo '<a href="${{ github.event.org.url }}/graphs/contributors">
               <img src="${{ github.event.org.avatar_url }}/CONTRIBUTORS.svg" />
           </a>' >> RELEASE_BODY.txt
+          ${{steps.github_release.outputs.changelog}} >>  RELEASE_BODY.txt 
           
       - name: Create release 🌟
         uses: softprops/action-gh-release@v1
         with:
           body_path: RELEASE_BODY.txt
           token: ${{ secrets.GITHUB_TOKEN }}
-          files: 
-            "build/CONTRIBUTORS.svg"
+          files: |
+            build/CONTRIBUTORS.svg
+            LICENSE
           generate_release_notes: true
 
 
