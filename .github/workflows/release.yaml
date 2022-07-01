@@ -53,7 +53,8 @@ jobs:
           echo '<a href="${{ github.event.repo.url }}/graphs/contributors">
               <img src="${{ github.event.repo.url }}/CONTRIBUTORS.svg" />
           </a>' >> RELEASE_BODY.txt
-          ${{steps.github_release.outputs.changelog}} >>  RELEASE_BODY.txt 
+          ${{steps.github_release.outputs.changelog}} >>  RELEASE_BODY.txt
+          cat RELEASE_BODY.txt 
       
       - name: Test
         run: cat RELEASE_BODY.txt 
