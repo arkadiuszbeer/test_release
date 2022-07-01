@@ -48,7 +48,9 @@ jobs:
       - name: Combine Changelog 📜
         run: |
           RELEASE_VERSION=$(awk -F: '/Version:/{gsub(/[ ]+/,"") ; print $2}' DESCRIPTION)
+          echo "RELEASE_VERSION: ${RELEASE_VERSION}"
           REPOSITORY_NAME="${{ github.event.repository.name }}"
+          echo "REPOSITORY_NAME ${REPOSITORY_NAME}"
           (awk "/^#+.*${REPOSITORY_NAME//./\.}.*${RELEASE_VERSION//./\.}$/{flag=1;next}/^#+.*${REPOSITORY_NAME//./\.}.*/{flag=0}flag" NEWS.md | grep -v "^$" || echo "* ${RELEASE_VERSION}") > RELEASE_BODY.txt
           echo '<a href="${{ github.event.repo.url }}/graphs/contributors">
               <img src="${{ github.event.repo.url }}/CONTRIBUTORS.svg" />
