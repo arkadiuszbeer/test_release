@@ -3,7 +3,8 @@
 ### Enhancements
 
 * Updated the internals of `module_teal` to reflect changes in `teal.slice`.
-
+* bla bla
+* 
 # test 0.0.1
 
 ### Enhancements
