@@ -28,10 +28,9 @@ jobs:
         uses: mikepenz/release-changelog-builder-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          configuration: "configs.json"
-          token: ${{ secrets.GITHUB_TOKEN }}
-
+        #with:
+        #  configuration: "configs.json"
+          
       - name: Echo Complex Configuration Changelog
         env:
           CHANGELOG: ${{ steps.complex_release.outputs.changelog }}
@@ -67,8 +66,8 @@ jobs:
           body_path: RELEASE_BODY.txt
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
-            build/CONTRIBUTORS.svg
-            LICENSE
+            ./build/CONTRIBUTORS.svg
+            /LICENSE
           generate_release_notes: true
 
 
