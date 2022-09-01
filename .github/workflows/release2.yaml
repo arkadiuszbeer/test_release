@@ -1,0 +1,105 @@
+---
+name: Release2 🚀
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_call:
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+    name: Release 🚀
+    runs-on: ubuntu-latest
+    if: "! contains(github.event.commits[0].message, '[skip release]')"
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repo 🛎
+        uses: actions/checkout@v3
+
+      - name: "Build Changelog"
+        id: build_changelog
+        uses: mikepenz/release-changelog-builder-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        #with:
+        #  configuration: "configs.json"
+          
+      - name: Echo Complex Configuration Changelog
+        env:
+          CHANGELOG: ${{ steps.complex_release.outputs.changelog }}
+        run: echo "CHANGELOG"
+
+      - name: Generate Contributors Images
+        uses: jaywcjlove/github-action-contributors@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          filter-author: renovate\[bot\]
+          output: build/CONTRIBUTORS.svg
+          avatarSize: 36
+
+      - name: Combine Changelog 📜
+        run: |
+          RELEASE_VERSION=$(awk -F: '/Version:/{gsub(/[ ]+/,"") ; print $2}' DESCRIPTION)
+          echo "RELEASE_VERSION: ${RELEASE_VERSION}"
+          REPOSITORY_NAME="${{ github.event.repository.name }}"
+          echo "REPOSITORY_NAME ${REPOSITORY_NAME}"
+          (awk "/^#+.*${REPOSITORY_NAME//./\.}.*${RELEASE_VERSION//./\.}$/{flag=1;next}/^#+.*${REPOSITORY_NAME//./\.}.*/{flag=0}flag" NEWS.md | grep -v "^$" || echo "* ${RELEASE_VERSION}") > RELEASE_BODY.txt
+          echo '<a href="${{ github.event.repo.url }}/graphs/contributors">
+              <img src="${{ github.event.repo.url }}/CONTRIBUTORS.svg" />
+          </a>' >> RELEASE_BODY.txt
+          ${{steps.github_release.outputs.changelog}} >>  RELEASE_BODY.txt
+          cat RELEASE_BODY.txt 
+      
+      - name: Test
+        run: cat RELEASE_BODY.txt 
+
+      - uses: BobAnkh/add-contributors@master
+        with:
+          CONTRIBUTOR: '### Contributors'
+          COLUMN_PER_ROW: '6'
+          ACCESS_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          IMG_WIDTH: '100'
+          FONT_SIZE: '14'
+          PATH: '/README.md'
+          COMMIT_MESSAGE: 'docs(README): update contributors'
+          AVATAR_SHAPE: 'round'
+          
+      - name: Create release 🌟
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: RELEASE_BODY.txt
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: |
+            ./build/CONTRIBUTORS.svg
+            /LICENSE
+          generate_release_notes: true
+
+      - name: Contribute List
+        uses: akhilmhdh/contributors-readme-action@v2.3.6
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            
+
+      # - name: Generate Changelog
+      #   id: changelog
+      #   uses: jaywcjlove/changelog-generator@v1.5.0
+      #   with:
+      #     head-ref: ${{steps.create_tag.outputs.version}}
+      #     filter-author: (小弟调调™|Renovate Bot)
+      #     filter: '[R|r]elease[d]\s+[v|V]\d(\.\d+){0,2}'
+          
+      # - name: Create Release
+      #   uses: ncipollo/release-action@v1
+      #   with:
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     bodyFile: "RELEASE_BODY.txt"
+      #     artifacts: "release.tar.gz,foo/*.txt"
+      #     allowUpdates: true
+          
